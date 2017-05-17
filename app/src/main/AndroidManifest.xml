@@ -3,6 +3,7 @@
     package="com.clock.performance.tools">
 
     <application
+        android:name=".AndroidPerformanceToolsApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -16,7 +17,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".anr.ANRActivity"></activity>
+        <activity android:name=".anr.ANRSamplesActivity"></activity>
     </application>
 
 </manifest>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    tools:context="com.clock.performance.tools.anr.ANRSamplesActivity">
+
+    <ProgressBar
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_gravity="center_horizontal" />
+
+    <Button
+        android:id="@+id/btn_anr_looper"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="使用ANRLooper(轮询)" />
+
+    <Button
+        android:id="@+id/btn_file_observer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="使用FileObserver(监听)" />
+
+    <Button
+        android:id="@+id/btn_ui_thread_create_anr"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="UI线程来个ANR" />
+
+    <Button
+        android:id="@+id/btn_worker_thread_create_anr"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Worker线程来个ANR" />
+</LinearLayout>

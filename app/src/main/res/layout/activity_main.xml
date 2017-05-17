@@ -8,9 +8,9 @@
     tools:context="com.clock.performance.tools.MainActivity">
 
     <Button
-        android:id="@+id/btn_anr_monitor"
+        android:id="@+id/btn_anr_samples"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="ANR Monitor" />
+        android:text="ANR Samples" />
 
 </LinearLayout>

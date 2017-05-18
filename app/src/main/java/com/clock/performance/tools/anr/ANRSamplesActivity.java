@@ -24,10 +24,17 @@ public class ANRSamplesActivity extends AppCompatActivity implements View.OnClic
     public void onClick(View view) {
         int viewId = view.getId();
         if (viewId == R.id.btn_anr_looper){
+            ANRLooper.getANRLooper().start();
 
         } else if (viewId == R.id.btn_file_observer){
 
         } else if (viewId == R.id.btn_ui_thread_create_anr){
+
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
         } else if (viewId == R.id.btn_worker_thread_create_anr){
 

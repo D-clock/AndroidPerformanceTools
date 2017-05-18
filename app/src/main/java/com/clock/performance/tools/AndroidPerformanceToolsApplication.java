@@ -2,6 +2,7 @@ package com.clock.performance.tools;
 
 import android.app.Application;
 
+import com.clock.performance.tools.anr.ANRError;
 import com.clock.performance.tools.anr.ANRLooper;
 
 /**
@@ -10,6 +11,8 @@ import com.clock.performance.tools.anr.ANRLooper;
 
 public class AndroidPerformanceToolsApplication extends Application {
 
+    private final static String TAG = AndroidPerformanceToolsApplication.class.getSimpleName();
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -17,6 +20,14 @@ public class AndroidPerformanceToolsApplication extends Application {
         ANRLooper.initialize(new ANRLooper.Builder(this)
                 .setFrequency(2000)
                 .setIgnoreDebugger(true)
+                .setReportAllThreadInfo(true)
+                .setOnNoRespondingListener(new ANRLooper.OnNoRespondingListener() {
+                    @Override
+                    public void onNoResponding(ANRError anrError) {
+                        anrError.printStackTrace();
+                        //throw anrError;
+                    }
+                })
                 .build());
     }
 }

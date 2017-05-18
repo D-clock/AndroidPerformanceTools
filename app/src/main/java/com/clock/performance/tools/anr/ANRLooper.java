@@ -44,6 +44,14 @@ public class ANRLooper extends Thread {
      * 是否忽略debug产生的ANR
      */
     private boolean ignoreDebugger;
+    /**
+     * 发生ANR时是否上报所有线程的ANR信息
+     */
+    private boolean reportAllThreadInfo;
+    /**
+     * 反生ANR时回调
+     */
+    private OnNoRespondingListener onNoRespondingListener;
 
     /**
      * 初始化ANRLooper，在Application中做初始化
@@ -75,6 +83,8 @@ public class ANRLooper extends Thread {
         this.appContext = configuration.appContext;
         this.frequency = configuration.frequency < MIN_FREQUENCY ? MIN_FREQUENCY : configuration.frequency;
         this.ignoreDebugger = configuration.ignoreDebugger;
+        this.reportAllThreadInfo = configuration.reportAllThreadInfo;
+        this.onNoRespondingListener = configuration.onNoRespondingListener;
 
         setName(ANR_LOOPER_THREAD_NAME);
     }
@@ -101,7 +111,16 @@ public class ANRLooper extends Thread {
                 }
 
                 ANRError anrError;
+                if (reportAllThreadInfo) {
+                    anrError = ANRError.getUiThread();
+                } else {
+                    anrError = ANRError.getAllThread();
+                }
 
+                if (onNoRespondingListener != null){
+                    onNoRespondingListener.onNoResponding(anrError);
+                }
+                break;
             }
 
         }
@@ -120,6 +139,14 @@ public class ANRLooper extends Thread {
          * 是否忽略debug产生的ANR
          */
         private boolean ignoreDebugger;
+        /**
+         * 发生ANR时是否上报所有线程的ANR信息
+         */
+        private boolean reportAllThreadInfo = false;
+        /**
+         * 反生ANR时回调
+         */
+        private OnNoRespondingListener onNoRespondingListener;
 
         public Builder(Context appContext) {
             this.appContext = appContext;
@@ -147,11 +174,34 @@ public class ANRLooper extends Thread {
             return this;
         }
 
+        /**
+         * 设置发生ANR时，是否上报所有的线程信息，默认是false
+         *
+         * @param reportAllThreadInfo
+         * @return
+         */
+        public Builder setReportAllThreadInfo(boolean reportAllThreadInfo) {
+            this.reportAllThreadInfo = reportAllThreadInfo;
+            return this;
+        }
+
+        /**
+         * 设置发生ANR时，回调监听
+         *
+         * @param onNoRespondingListener
+         * @return
+         */
+        public Builder setOnNoRespondingListener(OnNoRespondingListener onNoRespondingListener) {
+            this.onNoRespondingListener = onNoRespondingListener;
+            return this;
+        }
+
         public Configuration build() {
             Configuration configuration = new Configuration();
             configuration.appContext = appContext;
             configuration.frequency = frequency;
             configuration.ignoreDebugger = ignoreDebugger;
+            configuration.onNoRespondingListener = onNoRespondingListener;
             return configuration;
         }
     }
@@ -169,5 +219,25 @@ public class ANRLooper extends Thread {
          * 是否忽略debug产生的ANR
          */
         private boolean ignoreDebugger;
+        /**
+         * 发生ANR时是否上报所有线程的ANR信息
+         */
+        private boolean reportAllThreadInfo;
+        /**
+         * 反生ANR时回调
+         */
+        private OnNoRespondingListener onNoRespondingListener;
+    }
+
+    /**
+     * ANR回调接口
+     */
+    public static interface OnNoRespondingListener {
+        /**
+         * 发生ANR时产生回调(在非UI线程中回调)
+         *
+         * @param anrError
+         */
+        public void onNoResponding(ANRError anrError);
     }
 }

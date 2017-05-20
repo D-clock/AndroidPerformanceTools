@@ -14,7 +14,7 @@ import android.util.Log;
  * Created by Clock 2017/5/16.
  */
 
-public class ANRLooper extends Thread {
+public class ANRLooper implements Runnable {
 
     private final static String TAG = ANRLooper.class.getSimpleName();
     private final static String ANR_LOOPER_THREAD_NAME = "anr-looper-thread";
@@ -53,6 +53,8 @@ public class ANRLooper extends Thread {
      */
     private OnNoRespondingListener onNoRespondingListener;
 
+    private boolean isStop = true;
+
     /**
      * 初始化ANRLooper，在Application中做初始化
      *
@@ -85,15 +87,12 @@ public class ANRLooper extends Thread {
         this.ignoreDebugger = configuration.ignoreDebugger;
         this.reportAllThreadInfo = configuration.reportAllThreadInfo;
         this.onNoRespondingListener = configuration.onNoRespondingListener;
-
-        setName(ANR_LOOPER_THREAD_NAME);
     }
 
     @Override
     public void run() {
-        super.run();
         int lastTickNumber;
-        while (!isInterrupted()) {
+        while (!isStop) {
             lastTickNumber = tickCounter;
             uiHandler.post(ticker);
 
@@ -123,6 +122,27 @@ public class ANRLooper extends Thread {
                 break;
             }
 
+        }
+    }
+
+    /**
+     * 开始监测ANR
+     */
+    public synchronized void start(){
+        if (isStop){
+            isStop = false;
+            Thread anrThread = new Thread(this);
+            anrThread.setName(ANR_LOOPER_THREAD_NAME);
+            anrThread.start();
+        }
+    }
+
+    /**
+     * 停止检测ANR
+     */
+    public synchronized void stop(){
+        if (!isStop){
+            isStop = true;
         }
     }
 

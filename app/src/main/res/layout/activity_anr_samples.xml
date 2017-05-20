@@ -13,10 +13,16 @@
         android:layout_gravity="center_horizontal" />
 
     <Button
-        android:id="@+id/btn_anr_looper"
+        android:id="@+id/btn_start_looper"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="使用ANRLooper(轮询)" />
+        android:text="start ANRLooper" />
+
+    <Button
+        android:id="@+id/btn_stop_looper"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="stop ANRLooper" />
 
     <Button
         android:id="@+id/btn_file_observer"

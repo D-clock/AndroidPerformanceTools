@@ -25,12 +25,6 @@
         android:text="stop ANRLooper" />
 
     <Button
-        android:id="@+id/btn_file_observer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="使用FileObserver(监听)" />
-
-    <Button
         android:id="@+id/btn_ui_thread_create_anr"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

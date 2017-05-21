@@ -25,7 +25,6 @@ public class AndroidPerformanceToolsApplication extends Application {
                     @Override
                     public void onNoResponding(ANRError anrError) {
                         anrError.printStackTrace();
-                        //throw anrError;
                     }
                 })
                 .build());

@@ -23,7 +23,6 @@ public class ANRSamplesActivity extends AppCompatActivity implements View.OnClic
 
         findViewById(R.id.btn_start_looper).setOnClickListener(this);
         findViewById(R.id.btn_stop_looper).setOnClickListener(this);
-        findViewById(R.id.btn_file_observer).setOnClickListener(this);
         findViewById(R.id.btn_ui_thread_create_anr).setOnClickListener(this);
         findViewById(R.id.btn_worker_thread_create_anr).setOnClickListener(this);
 
@@ -37,8 +36,6 @@ public class ANRSamplesActivity extends AppCompatActivity implements View.OnClic
 
         } else if (viewId == R.id.btn_stop_looper) {
             ANRLooper.getANRLooper().stop();
-
-        } else if (viewId == R.id.btn_file_observer) {
 
         } else if (viewId == R.id.btn_ui_thread_create_anr) {
 

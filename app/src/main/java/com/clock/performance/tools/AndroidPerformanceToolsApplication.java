@@ -21,6 +21,7 @@ public class AndroidPerformanceToolsApplication extends Application {
                 .setFrequency(2000)
                 .setIgnoreDebugger(true)
                 .setReportAllThreadInfo(true)
+                .setAnrLogSaveToSdCard(true)
                 .setOnNoRespondingListener(new ANRLooper.OnNoRespondingListener() {
                     @Override
                     public void onNoResponding(ANRError anrError) {

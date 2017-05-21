@@ -2,9 +2,20 @@ package com.clock.performance.tools.anr;
 
 import android.content.Context;
 import android.os.Debug;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.storage.StorageManager;
 import android.util.Log;
+
+import com.clock.performance.tools.utils.StorageUtils;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * ANRLooper
@@ -18,6 +29,7 @@ public class ANRLooper implements Runnable {
 
     private final static String TAG = ANRLooper.class.getSimpleName();
     private final static String ANR_LOOPER_THREAD_NAME = "anr-looper-thread";
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyyMMdd-HH-mm-ss");
     /**
      * 最小的轮询频率
      */
@@ -48,6 +60,10 @@ public class ANRLooper implements Runnable {
      * 发生ANR时是否上报所有线程的ANR信息
      */
     private boolean reportAllThreadInfo;
+    /**
+     * ANR日志是否保存到SD卡上
+     */
+    private boolean anrLogSaveToSdCard;
     /**
      * 反生ANR时回调
      */
@@ -87,6 +103,7 @@ public class ANRLooper implements Runnable {
         this.ignoreDebugger = configuration.ignoreDebugger;
         this.reportAllThreadInfo = configuration.reportAllThreadInfo;
         this.onNoRespondingListener = configuration.onNoRespondingListener;
+        this.anrLogSaveToSdCard = configuration.anrLogSaveToSdCard;
     }
 
     @Override
@@ -116,8 +133,17 @@ public class ANRLooper implements Runnable {
                     anrError = ANRError.getAllThread();
                 }
 
-                if (onNoRespondingListener != null){
+                if (onNoRespondingListener != null) {
                     onNoRespondingListener.onNoResponding(anrError);
+                }
+
+                if (anrLogSaveToSdCard) {
+                    if (StorageUtils.isMounted()) {
+                        File anrDir = getAnrDirectory();
+                        saveLogToSdcard(anrError, anrDir);
+                    } else {
+                        Log.w(TAG, "sdcard is unmounted");
+                    }
                 }
                 break;
             }
@@ -125,11 +151,60 @@ public class ANRLooper implements Runnable {
         }
     }
 
+    private void saveLogToSdcard(ANRError anrError, File dir) {
+        if (anrError == null) {
+            return;
+        }
+        if (dir != null && dir.exists() && dir.isDirectory()) {
+            String fileName = getAnrLogFileName();
+            File anrLogFile = new File(dir, fileName);
+            if (!anrLogFile.exists()) {
+                try {
+                    anrLogFile.createNewFile();
+                    PrintStream printStream = new PrintStream(new FileOutputStream(anrLogFile, false), true);
+                    anrError.printStackTrace(printStream);
+                    printStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    /**
+     * 获取ANR日志存储目录
+     *
+     * @return
+     */
+    private File getAnrDirectory() {
+        File cacheDir = appContext.getExternalCacheDir();
+        if (cacheDir != null) {
+            File anrDirectory = new File(cacheDir, "anr");
+            if (!anrDirectory.exists()) {
+                boolean successful = anrDirectory.mkdirs();
+                if (successful) {
+                    return anrDirectory;
+                } else {
+                    return null;
+                }
+            } else {
+                return anrDirectory;
+            }
+        }
+        return null;
+    }
+
+    private String getAnrLogFileName() {
+        String timeStampString = DATE_FORMAT.format(new Date());
+        String anrLogFileName = timeStampString + ".trace";
+        return anrLogFileName;
+    }
+
     /**
      * 开始监测ANR
      */
-    public synchronized void start(){
-        if (isStop){
+    public synchronized void start() {
+        if (isStop) {
             isStop = false;
             Thread anrThread = new Thread(this);
             anrThread.setName(ANR_LOOPER_THREAD_NAME);
@@ -140,8 +215,8 @@ public class ANRLooper implements Runnable {
     /**
      * 停止检测ANR
      */
-    public synchronized void stop(){
-        if (!isStop){
+    public synchronized void stop() {
+        if (!isStop) {
             isStop = true;
         }
     }
@@ -163,6 +238,10 @@ public class ANRLooper implements Runnable {
          * 发生ANR时是否上报所有线程的ANR信息
          */
         private boolean reportAllThreadInfo = false;
+        /**
+         * ANR日志是否保存到SD卡上
+         */
+        private boolean anrLogSaveToSdCard;
         /**
          * 反生ANR时回调
          */
@@ -205,6 +284,11 @@ public class ANRLooper implements Runnable {
             return this;
         }
 
+        public Builder setAnrLogSaveToSdCard(boolean anrLogSaveToSdCard) {
+            this.anrLogSaveToSdCard = anrLogSaveToSdCard;
+            return this;
+        }
+
         /**
          * 设置发生ANR时，回调监听
          *
@@ -221,6 +305,8 @@ public class ANRLooper implements Runnable {
             configuration.appContext = appContext;
             configuration.frequency = frequency;
             configuration.ignoreDebugger = ignoreDebugger;
+            configuration.reportAllThreadInfo = reportAllThreadInfo;
+            configuration.anrLogSaveToSdCard = anrLogSaveToSdCard;
             configuration.onNoRespondingListener = onNoRespondingListener;
             return configuration;
         }
@@ -243,6 +329,10 @@ public class ANRLooper implements Runnable {
          * 发生ANR时是否上报所有线程的ANR信息
          */
         private boolean reportAllThreadInfo;
+        /**
+         * ANR日志是否保存到SD卡上
+         */
+        private boolean anrLogSaveToSdCard;
         /**
          * 反生ANR时回调
          */

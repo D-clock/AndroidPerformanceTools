@@ -120,7 +120,7 @@ public class ANRLooper implements Runnable {
                 }
 
                 ANRError anrError;
-                if (reportAllThreadInfo) {
+                if (!reportAllThreadInfo) {
                     anrError = ANRError.getUiThread();
                 } else {
                     anrError = ANRError.getAllThread();

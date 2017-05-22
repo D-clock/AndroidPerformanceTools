@@ -2,10 +2,8 @@ package com.clock.performance.tools.anr;
 
 import android.content.Context;
 import android.os.Debug;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.storage.StorageManager;
 import android.util.Log;
 
 import com.clock.performance.tools.utils.StorageUtils;
@@ -33,7 +31,7 @@ public class ANRLooper implements Runnable {
     /**
      * 最小的轮询频率
      */
-    private final static long MIN_FREQUENCY = 5000;
+    private final static long DEFAULT_FREQUENCY = 5000;
 
     private static ANRLooper sLooper;
     /**
@@ -48,10 +46,6 @@ public class ANRLooper implements Runnable {
             tickCounter = (tickCounter + 1) % Integer.MAX_VALUE;
         }
     };
-    /**
-     * 轮询的时间频率（单位：s）
-     */
-    private long frequency;
     /**
      * 是否忽略debug产生的ANR
      */
@@ -99,7 +93,6 @@ public class ANRLooper implements Runnable {
 
     private void init(Configuration configuration) {
         this.appContext = configuration.appContext;
-        this.frequency = configuration.frequency < MIN_FREQUENCY ? MIN_FREQUENCY : configuration.frequency;
         this.ignoreDebugger = configuration.ignoreDebugger;
         this.reportAllThreadInfo = configuration.reportAllThreadInfo;
         this.onNoRespondingListener = configuration.onNoRespondingListener;
@@ -114,7 +107,7 @@ public class ANRLooper implements Runnable {
             uiHandler.post(ticker);
 
             try {
-                Thread.sleep(frequency);
+                Thread.sleep(DEFAULT_FREQUENCY);
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 break;
@@ -227,10 +220,6 @@ public class ANRLooper implements Runnable {
          */
         private Context appContext;
         /**
-         * 轮询的时间频率（单位：s）
-         */
-        private long frequency;
-        /**
          * 是否忽略debug产生的ANR
          */
         private boolean ignoreDebugger;
@@ -249,17 +238,6 @@ public class ANRLooper implements Runnable {
 
         public Builder(Context appContext) {
             this.appContext = appContext;
-        }
-
-        /**
-         * 设置轮询的时间频率
-         *
-         * @param frequency
-         * @return
-         */
-        public Builder setFrequency(long frequency) {
-            this.frequency = frequency;
-            return this;
         }
 
         /**
@@ -303,7 +281,6 @@ public class ANRLooper implements Runnable {
         public Configuration build() {
             Configuration configuration = new Configuration();
             configuration.appContext = appContext;
-            configuration.frequency = frequency;
             configuration.ignoreDebugger = ignoreDebugger;
             configuration.reportAllThreadInfo = reportAllThreadInfo;
             configuration.anrLogSaveToSdCard = anrLogSaveToSdCard;
@@ -317,10 +294,6 @@ public class ANRLooper implements Runnable {
          * Application的Context
          */
         private Context appContext;
-        /**
-         * 轮询的时间频率（单位：s）
-         */
-        private long frequency;
         /**
          * 是否忽略debug产生的ANR
          */

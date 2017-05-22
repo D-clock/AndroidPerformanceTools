@@ -18,7 +18,6 @@ public class AndroidPerformanceToolsApplication extends Application {
         super.onCreate();
 
         ANRLooper.initialize(new ANRLooper.Builder(this)
-                .setFrequency(2000)
                 .setIgnoreDebugger(true)
                 .setReportAllThreadInfo(true)
                 .setAnrLogSaveToSdCard(true)

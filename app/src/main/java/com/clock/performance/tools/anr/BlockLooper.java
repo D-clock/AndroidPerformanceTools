@@ -43,6 +43,7 @@ public class BlockLooper implements Runnable {
             tickCounter = (tickCounter + 1) % Integer.MAX_VALUE;
         }
     };
+    private long frequency;
     private boolean ignoreDebugger;
     private boolean reportAllThreadInfo;
     private boolean saveLog;
@@ -73,6 +74,7 @@ public class BlockLooper implements Runnable {
 
     private void init(Configuration configuration) {
         this.appContext = configuration.appContext;
+        this.frequency = configuration.frequency < DEFAULT_FREQUENCY ? DEFAULT_FREQUENCY : configuration.frequency;
         this.ignoreDebugger = configuration.ignoreDebugger;
         this.reportAllThreadInfo = configuration.reportAllThreadInfo;
         this.onBlockListener = configuration.onBlockListener;
@@ -87,7 +89,7 @@ public class BlockLooper implements Runnable {
             uiHandler.post(ticker);
 
             try {
-                Thread.sleep(DEFAULT_FREQUENCY);
+                Thread.sleep(frequency);
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 break;
@@ -185,6 +187,7 @@ public class BlockLooper implements Runnable {
 
     public static class Builder {
         private Context appContext;
+        private long frequency;
         private boolean ignoreDebugger;
         private boolean reportAllThreadInfo = false;
         private boolean saveLog;
@@ -192,6 +195,11 @@ public class BlockLooper implements Runnable {
 
         public Builder(Context appContext) {
             this.appContext = appContext;
+        }
+
+        public Builder setFrequency(long frequency) {
+            this.frequency = frequency;
+            return this;
         }
 
         /**
@@ -245,6 +253,7 @@ public class BlockLooper implements Runnable {
 
     private static class Configuration {
         private Context appContext;
+        private long frequency;
         private boolean ignoreDebugger;
         private boolean reportAllThreadInfo;
         private boolean saveLog;

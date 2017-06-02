@@ -10,6 +10,4 @@
 
 感谢以下提供思路的（开源/闭源）项目！
 
-### ANR
-
-- [ANR-WatchDog](https://github.com/SalomonBrys/ANR-WatchDog)
+- https://github.com/SalomonBrys/ANR-WatchDog

@@ -31,10 +31,10 @@ public class ANRSamplesActivity extends AppCompatActivity implements View.OnClic
     public void onClick(View view) {
         int viewId = view.getId();
         if (viewId == R.id.btn_start_looper) {
-            ANRLooper.getANRLooper().start();
+            BlockLooper.getBlockLooper().start();
 
         } else if (viewId == R.id.btn_stop_looper) {
-            ANRLooper.getANRLooper().stop();
+            BlockLooper.getBlockLooper().stop();
 
         } else if (viewId == R.id.btn_ui_thread_create_anr) {
 

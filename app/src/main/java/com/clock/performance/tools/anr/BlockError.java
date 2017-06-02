@@ -7,28 +7,26 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * ANR错误信息
- * <p>
  * Created by Clock on 2017/5/16.
  */
 
-public class ANRError extends Error {
+public class BlockError extends Error {
 
-    private ANRError(ThreadStackInfoWrapper.ThreadStackInfo threadStackInfo) {
-        super("ANRLooper Catch ANRError", threadStackInfo);
+    private BlockError(ThreadStackInfoWrapper.ThreadStackInfo threadStackInfo) {
+        super("BlockLooper Catch BlockError", threadStackInfo);
     }
 
 
-    public static ANRError getUiThread() {
+    public static BlockError getUiThread() {
         Thread uiThread = Looper.getMainLooper().getThread();
         StackTraceElement[] stackTraceElements = uiThread.getStackTrace();
         ThreadStackInfoWrapper.ThreadStackInfo threadStackInfo = new ThreadStackInfoWrapper(getThreadNameAndState(uiThread), stackTraceElements)
                 .new ThreadStackInfo(null);
-        return new ANRError(threadStackInfo);
+        return new BlockError(threadStackInfo);
     }
 
 
-    public static ANRError getAllThread() {
+    public static BlockError getAllThread() {
         final Thread uiThread = Looper.getMainLooper().getThread();
         Map<Thread, StackTraceElement[]> stackTraceElementMap = new TreeMap<Thread, StackTraceElement[]>(new Comparator<Thread>() {
             @Override
@@ -65,7 +63,7 @@ public class ANRError extends Error {
                     new ThreadStackInfo(threadStackInfo);
         }
 
-        return new ANRError(threadStackInfo);
+        return new BlockError(threadStackInfo);
 
     }
 

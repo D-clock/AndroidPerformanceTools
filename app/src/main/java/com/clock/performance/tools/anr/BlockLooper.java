@@ -16,27 +16,24 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * ANRLooper
+ * BlockLooper
  * <p>
- * 使用线程轮询的方式监听App是否产生ANR
+ * 使用线程轮询的方式监听App是否产生卡顿
  * <p>
  * Created by Clock 2017/5/16.
  */
 
-public class ANRLooper implements Runnable {
+public class BlockLooper implements Runnable {
 
-    private final static String TAG = ANRLooper.class.getSimpleName();
-    private final static String ANR_LOOPER_THREAD_NAME = "anr-looper-thread";
+    private final static String TAG = BlockLooper.class.getSimpleName();
+    private final static String LOOPER_NAME = "block-looper-thread";
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyyMMdd-HH-mm-ss");
     /**
      * 最小的轮询频率
      */
     private final static long DEFAULT_FREQUENCY = 5000;
 
-    private static ANRLooper sLooper;
-    /**
-     * Application的Context
-     */
+    private static BlockLooper sLooper;
     private Context appContext;
     private Handler uiHandler = new Handler(Looper.getMainLooper());
     private volatile int tickCounter = 0;
@@ -46,57 +43,40 @@ public class ANRLooper implements Runnable {
             tickCounter = (tickCounter + 1) % Integer.MAX_VALUE;
         }
     };
-    /**
-     * 是否忽略debug产生的ANR
-     */
     private boolean ignoreDebugger;
-    /**
-     * 发生ANR时是否上报所有线程的ANR信息
-     */
     private boolean reportAllThreadInfo;
-    /**
-     * ANR日志是否保存到SD卡上
-     */
-    private boolean anrLogSaveToSdCard;
-    /**
-     * 反生ANR时回调
-     */
-    private OnNoRespondingListener onNoRespondingListener;
+    private boolean saveLog;
+    private OnBlockListener onBlockListener;
 
     private boolean isStop = true;
 
-    /**
-     * 初始化ANRLooper，在Application中做初始化
-     *
-     * @param configuration
-     */
     public static void initialize(Configuration configuration) {
         if (sLooper == null) {
-            synchronized (ANRLooper.class) {
+            synchronized (BlockLooper.class) {
                 if (sLooper == null) {
-                    sLooper = new ANRLooper();
+                    sLooper = new BlockLooper();
                 }
             }
             sLooper.init(configuration);
         }
     }
 
-    public static ANRLooper getANRLooper() {
+    public static BlockLooper getBlockLooper() {
         if (sLooper == null) {
-            throw new IllegalStateException("未使用initialize方法初始化ANRLooper");
+            throw new IllegalStateException("未使用initialize方法初始化BlockLooper");
         }
         return sLooper;
     }
 
-    private ANRLooper() {
+    private BlockLooper() {
     }
 
     private void init(Configuration configuration) {
         this.appContext = configuration.appContext;
         this.ignoreDebugger = configuration.ignoreDebugger;
         this.reportAllThreadInfo = configuration.reportAllThreadInfo;
-        this.onNoRespondingListener = configuration.onNoRespondingListener;
-        this.anrLogSaveToSdCard = configuration.anrLogSaveToSdCard;
+        this.onBlockListener = configuration.onBlockListener;
+        this.saveLog = configuration.saveLog;
     }
 
     @Override
@@ -119,21 +99,21 @@ public class ANRLooper implements Runnable {
                     continue;
                 }
 
-                ANRError anrError;
+                BlockError blockError;
                 if (!reportAllThreadInfo) {
-                    anrError = ANRError.getUiThread();
+                    blockError = BlockError.getUiThread();
                 } else {
-                    anrError = ANRError.getAllThread();
+                    blockError = BlockError.getAllThread();
                 }
 
-                if (onNoRespondingListener != null) {
-                    onNoRespondingListener.onNoResponding(anrError);
+                if (onBlockListener != null) {
+                    onBlockListener.onBlock(blockError);
                 }
 
-                if (anrLogSaveToSdCard) {
+                if (saveLog) {
                     if (StorageUtils.isMounted()) {
-                        File anrDir = getAnrDirectory();
-                        saveLogToSdcard(anrError, anrDir);
+                        File logDir = getLogDirectory();
+                        saveLogToSdcard(blockError, logDir);
                     } else {
                         Log.w(TAG, "sdcard is unmounted");
                     }
@@ -144,18 +124,18 @@ public class ANRLooper implements Runnable {
         }
     }
 
-    private void saveLogToSdcard(ANRError anrError, File dir) {
-        if (anrError == null) {
+    private void saveLogToSdcard(BlockError blockError, File dir) {
+        if (blockError == null) {
             return;
         }
         if (dir != null && dir.exists() && dir.isDirectory()) {
-            String fileName = getAnrLogFileName();
-            File anrLogFile = new File(dir, fileName);
-            if (!anrLogFile.exists()) {
+            String fileName = getLogFileName();
+            File logFile = new File(dir, fileName);
+            if (!logFile.exists()) {
                 try {
-                    anrLogFile.createNewFile();
-                    PrintStream printStream = new PrintStream(new FileOutputStream(anrLogFile, false), true);
-                    anrError.printStackTrace(printStream);
+                    logFile.createNewFile();
+                    PrintStream printStream = new PrintStream(new FileOutputStream(logFile, false), true);
+                    blockError.printStackTrace(printStream);
                     printStream.close();
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -164,50 +144,39 @@ public class ANRLooper implements Runnable {
         }
     }
 
-    /**
-     * 获取ANR日志存储目录
-     *
-     * @return
-     */
-    private File getAnrDirectory() {
+    private File getLogDirectory() {
         File cacheDir = appContext.getExternalCacheDir();
         if (cacheDir != null) {
-            File anrDirectory = new File(cacheDir, "anr");
-            if (!anrDirectory.exists()) {
-                boolean successful = anrDirectory.mkdirs();
+            File logDir = new File(cacheDir, "block");
+            if (!logDir.exists()) {
+                boolean successful = logDir.mkdirs();
                 if (successful) {
-                    return anrDirectory;
+                    return logDir;
                 } else {
                     return null;
                 }
             } else {
-                return anrDirectory;
+                return logDir;
             }
         }
         return null;
     }
 
-    private String getAnrLogFileName() {
+    private String getLogFileName() {
         String timeStampString = DATE_FORMAT.format(new Date());
-        String anrLogFileName = timeStampString + ".trace";
-        return anrLogFileName;
+        String fileName = timeStampString + ".trace";
+        return fileName;
     }
 
-    /**
-     * 开始监测ANR
-     */
     public synchronized void start() {
         if (isStop) {
             isStop = false;
-            Thread anrThread = new Thread(this);
-            anrThread.setName(ANR_LOOPER_THREAD_NAME);
-            anrThread.start();
+            Thread blockThread = new Thread(this);
+            blockThread.setName(LOOPER_NAME);
+            blockThread.start();
         }
     }
 
-    /**
-     * 停止检测ANR
-     */
     public synchronized void stop() {
         if (!isStop) {
             isStop = true;
@@ -215,33 +184,18 @@ public class ANRLooper implements Runnable {
     }
 
     public static class Builder {
-        /**
-         * Application的Context
-         */
         private Context appContext;
-        /**
-         * 是否忽略debug产生的ANR
-         */
         private boolean ignoreDebugger;
-        /**
-         * 发生ANR时是否上报所有线程的ANR信息
-         */
         private boolean reportAllThreadInfo = false;
-        /**
-         * ANR日志是否保存到SD卡上
-         */
-        private boolean anrLogSaveToSdCard;
-        /**
-         * 反生ANR时回调
-         */
-        private OnNoRespondingListener onNoRespondingListener;
+        private boolean saveLog;
+        private OnBlockListener onBlockListener;
 
         public Builder(Context appContext) {
             this.appContext = appContext;
         }
 
         /**
-         * 设置是否忽略debugger模式引起的ANR
+         * 设置是否忽略debugger模式引起的卡顿
          *
          * @param ignoreDebugger
          * @return
@@ -252,7 +206,7 @@ public class ANRLooper implements Runnable {
         }
 
         /**
-         * 设置发生ANR时，是否上报所有的线程信息，默认是false
+         * 设置发生卡顿时，是否上报所有的线程信息，默认是false
          *
          * @param reportAllThreadInfo
          * @return
@@ -262,19 +216,19 @@ public class ANRLooper implements Runnable {
             return this;
         }
 
-        public Builder setAnrLogSaveToSdCard(boolean anrLogSaveToSdCard) {
-            this.anrLogSaveToSdCard = anrLogSaveToSdCard;
+        public Builder setSaveLog(boolean saveLog) {
+            this.saveLog = saveLog;
             return this;
         }
 
         /**
-         * 设置发生ANR时，回调监听
+         * 设置发生卡顿时的回调
          *
-         * @param onNoRespondingListener
+         * @param onBlockListener
          * @return
          */
-        public Builder setOnNoRespondingListener(OnNoRespondingListener onNoRespondingListener) {
-            this.onNoRespondingListener = onNoRespondingListener;
+        public Builder setOnBlockListener(OnBlockListener onBlockListener) {
+            this.onBlockListener = onBlockListener;
             return this;
         }
 
@@ -283,44 +237,26 @@ public class ANRLooper implements Runnable {
             configuration.appContext = appContext;
             configuration.ignoreDebugger = ignoreDebugger;
             configuration.reportAllThreadInfo = reportAllThreadInfo;
-            configuration.anrLogSaveToSdCard = anrLogSaveToSdCard;
-            configuration.onNoRespondingListener = onNoRespondingListener;
+            configuration.saveLog = saveLog;
+            configuration.onBlockListener = onBlockListener;
             return configuration;
         }
     }
 
     private static class Configuration {
-        /**
-         * Application的Context
-         */
         private Context appContext;
-        /**
-         * 是否忽略debug产生的ANR
-         */
         private boolean ignoreDebugger;
-        /**
-         * 发生ANR时是否上报所有线程的ANR信息
-         */
         private boolean reportAllThreadInfo;
-        /**
-         * ANR日志是否保存到SD卡上
-         */
-        private boolean anrLogSaveToSdCard;
-        /**
-         * 反生ANR时回调
-         */
-        private OnNoRespondingListener onNoRespondingListener;
+        private boolean saveLog;
+        private OnBlockListener onBlockListener;
     }
 
-    /**
-     * ANR回调接口
-     */
-    public static interface OnNoRespondingListener {
+    public static interface OnBlockListener {
         /**
          * 发生ANR时产生回调(在非UI线程中回调)
          *
-         * @param anrError
+         * @param blockError
          */
-        public void onNoResponding(ANRError anrError);
+        public void onBlock(BlockError blockError);
     }
 }

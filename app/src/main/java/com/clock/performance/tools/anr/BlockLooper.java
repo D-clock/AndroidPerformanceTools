@@ -243,6 +243,7 @@ public class BlockLooper implements Runnable {
         public Configuration build() {
             Configuration configuration = new Configuration();
             configuration.appContext = appContext;
+            configuration.frequency = frequency;
             configuration.ignoreDebugger = ignoreDebugger;
             configuration.reportAllThreadInfo = reportAllThreadInfo;
             configuration.saveLog = saveLog;

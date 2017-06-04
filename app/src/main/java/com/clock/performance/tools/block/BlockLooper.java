@@ -120,7 +120,6 @@ public class BlockLooper implements Runnable {
                         Log.w(TAG, "sdcard is unmounted");
                     }
                 }
-                break;
             }
 
         }

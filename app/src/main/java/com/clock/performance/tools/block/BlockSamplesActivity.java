@@ -1,5 +1,6 @@
 package com.clock.performance.tools.block;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -24,6 +25,7 @@ public class BlockSamplesActivity extends AppCompatActivity implements View.OnCl
         findViewById(R.id.btn_stop_looper).setOnClickListener(this);
         findViewById(R.id.btn_ui_thread_create_anr).setOnClickListener(this);
         findViewById(R.id.btn_worker_thread_create_anr).setOnClickListener(this);
+        findViewById(R.id.btn_send_broadcast).setOnClickListener(this);
 
     }
 
@@ -69,6 +71,13 @@ public class BlockSamplesActivity extends AppCompatActivity implements View.OnCl
                     }
                 }
             }, 1000);
+
+        } else if (viewId == R.id.btn_send_broadcast){
+
+            Intent intent = new Intent();
+            intent.setAction("com.clock.performance.tools.block");
+            sendBroadcast(intent);
+
         }
     }
 }

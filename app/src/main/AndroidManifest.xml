@@ -23,6 +23,15 @@
         <activity
             android:name=".block.BlockSamplesActivity"
             android:label="@string/block_samples_activity_name" />
+
+        <receiver
+            android:name=".block.BlockReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.clock.performance.tools.block" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

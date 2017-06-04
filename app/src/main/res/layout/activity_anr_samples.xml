@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp"
-    tools:context="com.clock.performance.tools.anr.ANRSamplesActivity">
+    tools:context="com.clock.performance.tools.block.BlockSamplesActivity">
 
     <ProgressBar
         android:layout_width="100dp"

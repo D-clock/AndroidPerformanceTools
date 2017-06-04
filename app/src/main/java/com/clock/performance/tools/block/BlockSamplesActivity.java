@@ -1,4 +1,4 @@
-package com.clock.performance.tools.anr;
+package com.clock.performance.tools.block;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -9,7 +9,7 @@ import android.widget.Toast;
 
 import com.clock.performance.tools.R;
 
-public class ANRSamplesActivity extends AppCompatActivity implements View.OnClickListener {
+public class BlockSamplesActivity extends AppCompatActivity implements View.OnClickListener {
 
     private Object lockObj = new Object();
 
@@ -65,7 +65,7 @@ public class ANRSamplesActivity extends AppCompatActivity implements View.OnClic
                 @Override
                 public void run() {
                     synchronized (lockObj) {
-                        Toast.makeText(ANRSamplesActivity.this, "hello anr", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(BlockSamplesActivity.this, "hello anr", Toast.LENGTH_SHORT).show();
                     }
                 }
             }, 1000);

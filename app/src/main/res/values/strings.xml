@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">AndroidPerformanceTools</string>
+    <string name="block_samples_activity_name">BlockSamples</string>
 </resources>

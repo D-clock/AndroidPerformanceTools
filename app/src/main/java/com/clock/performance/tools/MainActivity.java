@@ -13,7 +13,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
-import com.clock.performance.tools.anr.ANRSamplesActivity;
+import com.clock.performance.tools.block.BlockSamplesActivity;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         int viewId = view.getId();
         if (viewId == R.id.btn_anr_samples) {
-            Intent anrSamplesIntent = new Intent(this, ANRSamplesActivity.class);
+            Intent anrSamplesIntent = new Intent(this, BlockSamplesActivity.class);
             startActivity(anrSamplesIntent);
         }
     }

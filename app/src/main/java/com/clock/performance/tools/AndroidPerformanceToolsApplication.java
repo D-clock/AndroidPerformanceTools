@@ -18,7 +18,6 @@ public class AndroidPerformanceToolsApplication extends Application {
         super.onCreate();
 
         BlockLooper.initialize(new BlockLooper.Builder(this)
-                .setFrequency(8000)
                 .setIgnoreDebugger(true)
                 .setReportAllThreadInfo(true)
                 .setSaveLog(true)

@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.clock.performance.tools.R;
+import com.performance.tools.block.BlockLooper;
 
 public class BlockSamplesActivity extends AppCompatActivity implements View.OnClickListener {
 

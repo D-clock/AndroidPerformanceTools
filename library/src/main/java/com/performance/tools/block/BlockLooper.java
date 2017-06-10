@@ -1,4 +1,4 @@
-package com.clock.performance.tools.block;
+package com.performance.tools.block;
 
 import android.content.Context;
 import android.os.Debug;
@@ -6,7 +6,8 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
-import com.clock.performance.tools.utils.StorageUtils;
+
+import com.performance.tools.utils.StorageUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;

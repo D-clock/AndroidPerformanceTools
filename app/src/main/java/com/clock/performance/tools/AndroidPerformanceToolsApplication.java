@@ -2,8 +2,8 @@ package com.clock.performance.tools;
 
 import android.app.Application;
 
-import com.clock.performance.tools.block.BlockError;
-import com.clock.performance.tools.block.BlockLooper;
+import com.performance.tools.block.BlockError;
+import com.performance.tools.block.BlockLooper;
 
 /**
  * Created by Clock on 2017/5/16.

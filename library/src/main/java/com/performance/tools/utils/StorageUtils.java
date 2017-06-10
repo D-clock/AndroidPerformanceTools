@@ -1,4 +1,4 @@
-package com.clock.performance.tools.utils;
+package com.performance.tools.utils;
 
 import android.os.Environment;
 

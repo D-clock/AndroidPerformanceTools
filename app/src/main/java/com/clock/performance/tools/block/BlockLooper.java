@@ -29,9 +29,9 @@ public class BlockLooper implements Runnable {
     private final static String LOOPER_NAME = "block-looper-thread";
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyyMMdd-HH-mm-ss");
     /**
-     * 最小的轮询频率
+     * 最小的轮询频率（单位：ms）
      */
-    private final static long DEFAULT_FREQUENCY = 5000;
+    private final static long MIN_FREQUENCY = 500;
 
     private static BlockLooper sLooper;
     private Context appContext;
@@ -74,7 +74,7 @@ public class BlockLooper implements Runnable {
 
     private void init(Configuration configuration) {
         this.appContext = configuration.appContext;
-        this.frequency = configuration.frequency < DEFAULT_FREQUENCY ? DEFAULT_FREQUENCY : configuration.frequency;
+        this.frequency = configuration.frequency < MIN_FREQUENCY ? MIN_FREQUENCY : configuration.frequency;
         this.ignoreDebugger = configuration.ignoreDebugger;
         this.reportAllThreadInfo = configuration.reportAllThreadInfo;
         this.onBlockListener = configuration.onBlockListener;

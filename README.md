@@ -4,7 +4,11 @@
 
 ## Features
 
-- 检测ANR
+- 检测卡顿，并dump出卡顿发生时所有的堆栈信息，定位到卡顿源头。实现原理：[Android卡顿检测方案](http://blog.coderclock.com/2017/06/04/android/AndroidPerformanceTools-BlockLooper/)
+
+## Usage
+
+本项目目前没有打包上传至JCenter上，只能通过引入lib的方式进行使用，功能代码全部在library工程中，使用Demo在app工程中。
 
 ## Reference
 
